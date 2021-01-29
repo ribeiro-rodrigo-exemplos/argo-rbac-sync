@@ -1,7 +1,7 @@
 from typing import List
 import attr
 import requests
-from app.entities import Cluster, ClusterRoleBinding
+from app.model.entities import Cluster, ClusterRoleBinding
 
 
 @attr.s(auto_attribs=True)

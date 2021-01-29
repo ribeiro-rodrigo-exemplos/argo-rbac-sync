@@ -1,8 +1,8 @@
 from typing import List, Dict
 import csv
 from io import StringIO
-from app.entities import Cluster, ClusterRoleBinding, ClusterMember
-from app.rancher import RancherService
+from app.model.entities import Cluster, ClusterRoleBinding, ClusterMember
+from app.service.rancher import RancherService
 
 
 def list_cluster_members(rancher_service: RancherService) -> List[ClusterRoleBinding]:

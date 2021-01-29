@@ -1,16 +1,20 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from app.rancher import RancherService
+from app.pipeline import Pipeline
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def main():
+    url: str = "https://192.168.0.76"
+    token: str = "token-q5bhr:xtcd5lbzlg6mhnvncwbrk55zvmhb849vzqm7wnv2xtrtzhs9sq6dss"
+
+    service = RancherService(url=url, token=token)
+    pipeline = Pipeline(rancher_service=service)
+
+    pipeline.list_all_clusters() \
+            .list_all_members() \
+            .aggregate_results() \
+            .generate_rbac_csv() \
+            .save_configmap()
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    main()

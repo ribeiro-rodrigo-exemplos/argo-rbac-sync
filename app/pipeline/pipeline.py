@@ -3,8 +3,8 @@ import attr
 
 from app.service.rancher import RancherService
 from app.model.entities import Cluster, ClusterRoleBinding, ClusterMember
-from app.pipeline.steps import list_clusters, list_cluster_members, aggregate_cluster_members, generate_rbac_csv, \
-    save_rbac, remove_local_members as rm_local_members
+from app.pipeline.steps import list_clusters, list_cluster_members, aggregate_cluster_members, \
+    generate_rbac_csv, save_rbac, remove_local_members as rm_local_members
 
 
 class PipelineBuilder:

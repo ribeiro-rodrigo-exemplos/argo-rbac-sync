@@ -16,10 +16,14 @@ class ConfigResolver:
     @property
     def rancher_token(self) -> str:
         return self._get_config_value('RANCHER_TOKEN', 'rancher', 'token')
+
+    @property
+    def rancher_timeout(self) -> int:
+        return int(self._get_config_value("RANCHER_TIMEOUT", "rancher", "timeout"))
     
     @property
-    def group_admin(self) -> str:
-        return self._get_config_value("GROUP_ADMIN", "rbac", "group_admin")
+    def admin_group(self) -> str:
+        return self._get_config_value("ADMIN_GROUP", "rbac", "admin_group")
 
     def _get_config_value(
             self, environemnt_variable_name: str, config_name: str, config_attribute: str,

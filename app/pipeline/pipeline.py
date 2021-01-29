@@ -2,13 +2,10 @@ from typing import List
 import attr
 
 from app.service.rancher import RancherService
+from app.config.config_resolver import ConfigResolver
 from app.model.entities import Cluster, ClusterRoleBinding, ClusterMember
 from app.pipeline.steps import list_clusters, list_cluster_members, aggregate_cluster_members, \
     generate_rbac_csv, save_rbac, remove_local_members as rm_local_members
-
-
-class PipelineBuilder:
-    pass
 
 
 @attr.s(auto_attribs=True)
@@ -21,17 +18,18 @@ class PipelineState:
 
 @attr.s(auto_attribs=True)
 class Pipeline:
-    rancher_service: RancherService
+    _rancher_service: RancherService
+    _admin_group: str
 
     def __attrs_post_init__(self):
         self._state = PipelineState()
 
     def list_all_clusters(self):
-        self._state.clusters = list_clusters(self.rancher_service)
+        self._state.clusters = list_clusters(self._rancher_service)
         return self
 
     def list_all_members(self):
-        self._state.bindings = list_cluster_members(self.rancher_service)
+        self._state.bindings = list_cluster_members(self._rancher_service)
         return self
 
     def remove_local_members(self):
@@ -48,3 +46,17 @@ class Pipeline:
 
     def save_configmap(self):
         save_rbac(self._state.rbac_csv)
+
+
+@attr.s(auto_attribs=True)
+class PipelineBuilder:
+    _config: ConfigResolver
+
+    def build(self) -> Pipeline:
+        rancher_service = RancherService(
+            url=self._config.rancher_url,
+            token=self._config.rancher_token,
+            timeout=self._config.rancher_timeout,
+        )
+
+        return Pipeline(rancher_service=rancher_service, admin_group=self._config.admin_group)

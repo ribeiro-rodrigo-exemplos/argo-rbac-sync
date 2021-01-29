@@ -75,7 +75,7 @@ def generate_rbac_csv(cluster_members: List[ClusterMember]) -> str:
 
 
 def save_rbac(rbac_csv: str) -> object:
-    print(rbac_csv)
+    print(f"{rbac_csv} - nada")
     pass
 
 

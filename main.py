@@ -1,13 +1,10 @@
-from app.service.rancher import RancherService
-from app.pipeline import Pipeline
+from app.pipeline import PipelineBuilder
+from app.config.config_resolver import ConfigResolver
 
 
 def main():
-    url: str = "https://192.168.0.76"
-    token: str = "token-q5bhr:xtcd5lbzlg6mhnvncwbrk55zvmhb849vzqm7wnv2xtrtzhs9sq6dss"
 
-    service = RancherService(url=url, token=token)
-    pipeline = Pipeline(rancher_service=service)
+    pipeline = PipelineBuilder(ConfigResolver()).build()
 
     pipeline.list_all_clusters() \
             .list_all_members() \

@@ -11,7 +11,8 @@ def main():
 
     pipeline.list_all_clusters() \
             .list_all_members() \
-            .aggregate_results() \
+            .remove_local_members() \
+            .aggregate_cluster_members() \
             .generate_rbac_csv() \
             .save_configmap()
 

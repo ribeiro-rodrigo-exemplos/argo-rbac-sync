@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass
@@ -18,4 +17,4 @@ class ClusterRoleBinding:
 @dataclass
 class ClusterMember:
     cluster: Cluster
-    members: List[ClusterRoleBinding]
+    member: ClusterRoleBinding

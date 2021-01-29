@@ -2,7 +2,7 @@ from typing import List, Dict
 import csv
 from io import StringIO
 from app.model.entities import Cluster, ClusterRoleBinding, ClusterMember
-from app.service.rancher import RancherService
+from app.service import RancherService, RbacService
 
 
 def list_cluster_members(rancher_service: RancherService) -> List[ClusterRoleBinding]:
@@ -52,7 +52,7 @@ def aggregate_cluster_members(clusters: List[Cluster], bindings: List[ClusterRol
     return cluster_members
 
 
-def generate_rbac_csv(cluster_members: List[ClusterMember]) -> str:
+def generate_rbac_csv(cluster_members: List[ClusterMember], admin_group: str) -> str:
 
     def get_principal_name(cm: ClusterMember):
         return cm.member.principal_id.split(":")[1].replace("/", "")
@@ -67,6 +67,8 @@ def generate_rbac_csv(cluster_members: List[ClusterMember]) -> str:
         csv_lines.append(project_permission)
         csv_lines.append(application_permission)
 
+    csv_lines.append(["g", admin_group, "role:admin"])
+
     data = StringIO(initial_value="")
     writer = csv.writer(data)
     writer.writerows(csv_lines)
@@ -74,7 +76,7 @@ def generate_rbac_csv(cluster_members: List[ClusterMember]) -> str:
     return data.getvalue()
 
 
-def save_rbac(rbac_csv: str) -> object:
+def save_rbac(rbac_csv: str, rbac_service: RbacService) -> object:
     print(f"{rbac_csv} - nada")
     pass
 

@@ -1,7 +1,7 @@
 from typing import List
 import attr
 
-from app.service.rancher import RancherService
+from app.service import RancherService, RbacService
 from app.config.config_resolver import ConfigResolver
 from app.model.entities import Cluster, ClusterRoleBinding, ClusterMember
 from app.pipeline.steps import list_clusters, list_cluster_members, aggregate_cluster_members, \
@@ -19,6 +19,7 @@ class PipelineState:
 @attr.s(auto_attribs=True)
 class Pipeline:
     _rancher_service: RancherService
+    _rbac_service: RbacService
     _admin_group: str
 
     def __attrs_post_init__(self):
@@ -41,11 +42,11 @@ class Pipeline:
         return self
 
     def generate_rbac_csv(self):
-        self._state.rbac_csv = generate_rbac_csv(self._state.members)
+        self._state.rbac_csv = generate_rbac_csv(self._state.members, self._admin_group)
         return self
 
     def save_configmap(self):
-        save_rbac(self._state.rbac_csv)
+        save_rbac(self._state.rbac_csv, self._rbac_service)
 
 
 @attr.s(auto_attribs=True)
@@ -59,4 +60,8 @@ class PipelineBuilder:
             timeout=self._config.rancher_timeout,
         )
 
-        return Pipeline(rancher_service=rancher_service, admin_group=self._config.admin_group)
+        return Pipeline(
+            rancher_service=rancher_service,
+            rbac_service=RbacService(),
+            admin_group=self._config.admin_group
+        )

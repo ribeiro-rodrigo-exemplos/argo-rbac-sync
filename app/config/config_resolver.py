@@ -25,6 +25,10 @@ class ConfigResolver:
     def admin_group(self) -> str:
         return self._get_config_value("ADMIN_GROUP", "rbac", "admin_group")
 
+    @property
+    def argo_namespace(self) -> str:
+        return self._get_config_value("ARGO_NAMESPACE", "argo", "namespace")
+
     def _get_config_value(
             self, environemnt_variable_name: str, config_name: str, config_attribute: str,
     ) -> str:

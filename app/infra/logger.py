@@ -1,5 +1,8 @@
 import logging
 from app.config.config_resolver import ConfigResolver
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def _get_level_number(level_name: str) -> int:

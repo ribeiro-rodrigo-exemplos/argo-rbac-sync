@@ -9,8 +9,7 @@ def main():
 
     logger = get_logger(__name__)
 
-    logger.info("Inicializando pipeline de sincronismo rbac")
-    logger.debug("teste debug")
+    logger.info("Initializing RBAC sync pipeline")
 
     pipeline.list_all_clusters() \
             .list_all_members() \
@@ -18,6 +17,8 @@ def main():
             .aggregate_cluster_members() \
             .generate_rbac_csv() \
             .save_configmap()
+
+    logger.info("Successfully finalizing RBAC sync pipeline")
 
 
 if __name__ == "__main__":

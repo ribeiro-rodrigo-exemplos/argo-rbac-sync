@@ -1,12 +1,19 @@
 from typing import List, Dict
 import csv
 from io import StringIO
+
+from app.infra import get_logger
 from app.model.entities import Cluster, ClusterRoleBinding, ClusterMember
 from app.service import RancherService, RbacService
 
 
+_logger = get_logger(__name__)
+
+
 def list_cluster_members(rancher_service: RancherService) -> List[ClusterRoleBinding]:
-    return list(
+    _logger.debug("Listing all members in the Rancher")
+
+    members = list(
         map(
             lambda binding_dto: ClusterRoleBinding(
                     principal_id=binding_dto["userPrincipalId"] or binding_dto["groupPrincipalId"],
@@ -17,9 +24,15 @@ def list_cluster_members(rancher_service: RancherService) -> List[ClusterRoleBin
         )
     )
 
+    _logger.debug(f"Rancher listed members {members}")
+
+    return members
+
 
 def list_clusters(rancher_service: RancherService) -> List[Cluster]:
-    return list(
+    _logger.debug("Listing all clusters in the Rancher")
+
+    clusters = list(
         map(
             lambda cluster_dto: Cluster(
                 name=cluster_dto["name"],
@@ -29,8 +42,14 @@ def list_clusters(rancher_service: RancherService) -> List[Cluster]:
         )
     )
 
+    _logger.debug(f"Rancher listed clusters {clusters}")
+
+    return clusters
+
 
 def remove_local_members(bindings: List[ClusterRoleBinding]) -> List[ClusterRoleBinding]:
+    _logger.debug("Removing local members")
+
     return list(
         filter(
             lambda binding: not binding.principal_id.startswith("local"),
@@ -40,6 +59,7 @@ def remove_local_members(bindings: List[ClusterRoleBinding]) -> List[ClusterRole
 
 
 def aggregate_cluster_members(clusters: List[Cluster], bindings: List[ClusterRoleBinding]) -> List[ClusterMember]:
+    _logger.debug("Aggregating clusters and members")
 
     map_cluster: Dict[str, Cluster] = {cluster.id: cluster for cluster in clusters}
     cluster_members: List[ClusterMember] = []
@@ -49,10 +69,13 @@ def aggregate_cluster_members(clusters: List[Cluster], bindings: List[ClusterRol
         if cluster:
             cluster_members.append(ClusterMember(member=binding, cluster=cluster))
 
+    _logger.debug(f"Aggregation result {cluster_members}")
+
     return cluster_members
 
 
 def generate_rbac_csv(cluster_members: List[ClusterMember], admin_group: str) -> str:
+    _logger.debug("Generating CSV RBAC")
 
     def get_principal_name(cm: ClusterMember):
         return cm.member.principal_id.split(":")[1].replace("/", "")
@@ -73,14 +96,21 @@ def generate_rbac_csv(cluster_members: List[ClusterMember], admin_group: str) ->
     writer = csv.writer(data)
     writer.writerows(csv_lines)
 
+    csv_value = data.getvalue()
+
+    _logger.debug(f"RBAC CSV permissions generated: {csv_value}")
+
     return data.getvalue()
 
 
 def save_rbac(rbac_csv: str, rbac_service: RbacService):
+    _logger.debug("Checking the need to update RBAC permissions")
+
     current_rbac_csv = rbac_service.get_permissions()
 
     if current_rbac_csv != rbac_csv:
         rbac_service.save_permissions(rbac_csv)
+        _logger.debug("RBAC permissions saved successfully.")
 
 
 

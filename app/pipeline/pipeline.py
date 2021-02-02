@@ -62,6 +62,6 @@ class PipelineBuilder:
 
         return Pipeline(
             rancher_service=rancher_service,
-            rbac_service=RbacService(),
+            rbac_service=RbacService(self._config.argo_namespace),
             admin_group=self._config.admin_group
         )

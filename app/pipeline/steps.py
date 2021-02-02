@@ -76,9 +76,11 @@ def generate_rbac_csv(cluster_members: List[ClusterMember], admin_group: str) ->
     return data.getvalue()
 
 
-def save_rbac(rbac_csv: str, rbac_service: RbacService) -> object:
-    print(f"{rbac_csv} - nada")
-    pass
+def save_rbac(rbac_csv: str, rbac_service: RbacService):
+    current_rbac_csv = rbac_service.get_permissions()
+
+    if current_rbac_csv != rbac_csv:
+        rbac_service.save_permissions(rbac_csv)
 
 
 

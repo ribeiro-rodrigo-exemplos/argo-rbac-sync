@@ -36,7 +36,8 @@ class ConfigResolver:
         p.add_argument("--log")
 
         args = p.parse_args()
-        return args.log if args.log else os.getenv("LOG_LEVEL")
+        log_level = args.log or os.getenv("LOG_LEVEL")
+        return log_level if log_level else ""
 
     def _get_config_value(
             self, environment_variable_name: str, config_name: str, config_attribute: str,

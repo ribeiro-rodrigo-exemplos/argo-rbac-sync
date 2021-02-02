@@ -1,5 +1,6 @@
 import configparser
 import os
+import argparse
 
 
 class ConfigResolver:
@@ -28,6 +29,14 @@ class ConfigResolver:
     @property
     def argo_namespace(self) -> str:
         return self._get_config_value("ARGO_NAMESPACE", "argo", "namespace")
+
+    @property
+    def log_level(self) -> str:
+        p = argparse.ArgumentParser()
+        p.add_argument("--log")
+
+        args = p.parse_args()
+        return args.log if args.log else os.getenv("LOG_LEVEL")
 
     def _get_config_value(
             self, environment_variable_name: str, config_name: str, config_attribute: str,

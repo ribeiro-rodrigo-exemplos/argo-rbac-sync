@@ -1,11 +1,19 @@
 from kubernetes import client, config
 from kubernetes.client import V1ConfigMap
+from kubernetes.config.config_exception import ConfigException
+
+
+def _load_config():
+    try:
+        config.load_incluster_config()
+    except ConfigException:
+        config.load_kube_config()
 
 
 class RbacService:
 
     def __init__(self, argo_namespace: str):
-        config.load_kube_config()
+        _load_config()
         self._v1 = client.CoreV1Api()
         self._namespace = argo_namespace
         self._configmap_name = "argocd-rbac-cm"
@@ -33,6 +41,9 @@ class RbacService:
         response = self._v1.patch_namespaced_config_map(self._configmap_name, self._namespace, body)
         if not isinstance(response, V1ConfigMap):
             response.raise_for_status()
+
+
+
 
 
 

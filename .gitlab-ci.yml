@@ -1,0 +1,35 @@
+image: arielkv/dind-glibc:latest
+
+stages:
+  - build
+  - deploy
+
+services:
+  - docker:dind
+
+before_script:
+  - apk update
+  - apk add go curl
+  - curl -fL https://getcli.jfrog.io | sh
+  - ./jfrog rt config MyArtifactory --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_PASS
+  - docker login -u $ARTIFACTORY_USER $ARTIFACTORY_DOCKER_REPOSITORY -p $ARTIFACTORY_PASS
+
+build:
+  stage: build
+  only:
+    - tags
+  script:
+    # Build docker image
+    - docker build -t $ARTIFACTORY_DOCKER_REPOSITORY/kaas/dev/argo-rbac-sync/argo-rbac-sync:$CI_COMMIT_REF_NAME .
+    # Check created docker image
+    - docker run $ARTIFACTORY_DOCKER_REPOSITORY/kaas/dev/argo-rbac-sync/argo-rbac-sync:$CI_COMMIT_REF_NAME
+
+deploy:
+  stage: deploy
+  only:
+    - tags
+  dependencies:
+    - build
+  script:
+    # Push docker image to Artifactory
+    - ./jfrog rt dp $ARTIFACTORY_DOCKER_REPOSITORY/kaas/dev/argo-rbac-sync/argo-rbac-sync:$CI_COMMIT_REF_NAME $DOCKER_REPOSITORY_KEY --build-name=argo-rbac-sync --build-number=$CI_COMMIT_REF_NAME

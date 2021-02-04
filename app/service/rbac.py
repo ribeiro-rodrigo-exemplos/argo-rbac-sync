@@ -30,7 +30,7 @@ class RbacService:
             raise Exception(f"ConfigMap {self._configmap_name} not found")
 
         rbac_config_map = config_map_list.items[0]
-        return rbac_config_map.data.get("policy.csv")
+        return rbac_config_map.data.get("policy.csv") if rbac_config_map.data else None
 
     def save_permissions(self, rbac_csv: str):
         body = {

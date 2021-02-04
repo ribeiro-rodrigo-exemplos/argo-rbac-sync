@@ -87,8 +87,13 @@ def generate_rbac_csv(cluster_members: List[ClusterMember], admin_group: str) ->
         project_name = cluster_member.cluster.name
         project_permission = ["p", principal, "projects", "get", project_name, "allow"]
         application_permission = ["p", principal, "applications", "*", f"{project_name}/*", "allow"]
+        gpg_keys_permission = ["p", principal, "gpgkeys", "get", "*", "allow"]
+        cluster_permission = ["p", principal, "clusters", "get", cluster_member.cluster.name, "allow"]
+
         csv_lines.append(project_permission)
         csv_lines.append(application_permission)
+        csv_lines.append(gpg_keys_permission)
+        csv_lines.append(cluster_permission)
 
     csv_lines.append(["g", admin_group, "role:admin"])
 

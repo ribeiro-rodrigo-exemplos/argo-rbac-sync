@@ -21,12 +21,13 @@ class Pipeline:
     _rancher_service: RancherService
     _rbac_service: RbacService
     _admin_group: str
+    _rancher_url: str
 
     def __attrs_post_init__(self):
         self._state = PipelineState()
 
     def list_all_clusters(self):
-        self._state.clusters = list_clusters(self._rancher_service)
+        self._state.clusters = list_clusters(self._rancher_service, self._rancher_url)
         return self
 
     def list_all_members(self):
@@ -61,6 +62,7 @@ class PipelineBuilder:
         )
 
         return Pipeline(
+            rancher_url=self._config.rancher_url,
             rancher_service=rancher_service,
             rbac_service=RbacService(self._config.argo_namespace),
             admin_group=self._config.admin_group

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Cluster:
+    url: str
     name: str
     id: str
 

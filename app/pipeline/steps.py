@@ -29,12 +29,13 @@ def list_cluster_members(rancher_service: RancherService) -> List[ClusterRoleBin
     return members
 
 
-def list_clusters(rancher_service: RancherService) -> List[Cluster]:
+def list_clusters(rancher_service: RancherService, rancher_url: str) -> List[Cluster]:
     _logger.debug("Listing all clusters in the Rancher")
 
     clusters = list(
         map(
             lambda cluster_dto: Cluster(
+                url=f"{rancher_url}/k8s/clusters/{cluster_dto['id']}",
                 name=cluster_dto["name"],
                 id=cluster_dto["id"],
             ),
@@ -88,7 +89,7 @@ def generate_rbac_csv(cluster_members: List[ClusterMember], admin_group: str) ->
         project_permission = ["p", principal, "projects", "get", project_name, "allow"]
         application_permission = ["p", principal, "applications", "*", f"{project_name}/*", "allow"]
         gpg_keys_permission = ["p", principal, "gpgkeys", "get", "*", "allow"]
-        cluster_permission = ["p", principal, "clusters", "get", cluster_member.cluster.name, "allow"]
+        cluster_permission = ["p", principal, "clusters", "get", cluster_member.cluster.url, "allow"]
 
         csv_lines.append(project_permission)
         csv_lines.append(application_permission)
